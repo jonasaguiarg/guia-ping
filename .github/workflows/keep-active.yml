@@ -1,0 +1,21 @@
+name: keep-active
+on:
+  schedule:
+    - cron: "0 6 1,21 * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Registra atividade para o GitHub não desativar o agendamento do ping
+        run: |
+          date -u +%F > last-activity.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add last-activity.txt
+          git commit -m "Atividade de manutenção $(cat last-activity.txt)" || exit 0
+          git push
